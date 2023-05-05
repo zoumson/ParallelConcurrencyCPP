@@ -173,6 +173,11 @@ namespace za
 			
 			/*
 			* Each member is waiting for another member to take action
+			* 1. Which of these is a possible strategy to prevent deadlocks 
+			* when multiple threads will need to acquire multiple locks?
+			* 2. 
+			* The Dining Philosophers scenario demonstrates the deadlock 
+			* situation that can occur when multiple threads need(s) to acquire  multiple locks.
 			*/
 			static int sushi_count_d = 5000;
 			void philosopher(std::mutex& first_chopstick, std::mutex& second_chopstick);
@@ -180,18 +185,52 @@ namespace za
 		}
 		namespace abandoned_lock
 		{
+			
+			/*
+			* 1. 
+			* a. What happens when a thread terminates while still holding onto a mutex?
+			* b. The mutex will be stuck in the locked state forever and no other threads will be able to acquire it.
+			* 
+			* 2.
+			* a. Why does using a std::scoped_lock protect against a thread terminating while holding onto a mutex?
+			* b. When the thread terminates, the scoped_lock object is destroyed, and the mutex is automatically released.
+			*/
 			static int sushi_count_al = 5000;
 			void philosopher_al(std::mutex& chopsticks);
 			void demo10();
 		}
 		namespace starvation
 		{
+			/*
+			* 1. 
+			* a. Only the lowest priority threads will be at risk of resource starvation.
+			* b. False
+			* 
+			* 2. Starvation occurs when a thread is perpetually denied resources due to competition with other threads
+			*/
 			static int sushi_count_ss = 5000;
 			void philosopher_ss(std::mutex& chopsticks);
 			void demo11();
 		}		
 		namespace live_lock
 		{
+			/*
+			* 1.
+			* a. Which of these is a possible strategy to prevent 
+			* deadlocks when multiple threads will need to acquire multiple locks?
+			* b. Prioritize the locks so that all threads will acquire them in the same relative order.
+			* 
+			* 2.
+			* a. Which of these is a possible strategy to resolve a livelock between multiple threads?
+			* b. Implement a randomized mechanism to determine which thread goes first.
+			* 
+			* 3. Unlike during a deadlock, the threads in a livelock scenario 
+			* are actively executing without making useful progress.
+			* 4. The threads in your program are clearly not making progress. 
+			* a. How might you determine if it is due to a deadlock or a livelock?
+			* b. Use the Resource Monitor to investigate the program's CPU usage to see if it is actively executing.
+			*/
+			
 			static int sushi_count_ll = 5000;
 			void philosopher_ll(std::mutex& first_chopstick, std::mutex& second_chopstick);
 			void demo12();

@@ -289,8 +289,8 @@ namespace za
 			{
 				while (sushi_count_al > 0)
 				{
-					chopsticks.lock();
-					chopsticks.lock();
+					//chopsticks.lock();
+					// to be fixed
 					//std::scoped_lock lock(chopsticks);
 					if (sushi_count_al)
 					{
@@ -301,6 +301,8 @@ namespace za
 						std::cout << "This philosopher has had enough!" << std::endl;
 						break;
 					}
+					//won't be reached if break 
+					//chopsticks.unlock();
 				}
 			}
 
@@ -321,16 +323,16 @@ namespace za
 				int sushi_eaten = 0;
 				while (sushi_count_ss > 0) 
 				{
+					//to be fixed
 					//std::scoped_lock lock(chopsticks);
-					chopsticks.lock();
-					chopsticks.lock();
+					// only one thread get executed frequenty
+					//chopsticks.lock();
 					if (sushi_count_ss) 
 					{
 						sushi_count_ss--;
 						sushi_eaten++;
 					}
-					chopsticks.unlock();
-					chopsticks.unlock();
+					//chopsticks.unlock();
 				}
 				std::cout << "Philosopher " << std::this_thread::get_id() << " ate " << sushi_eaten << " ." << std::endl;
 			}
