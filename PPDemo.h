@@ -1,4 +1,7 @@
 #pragma once
+#include <barrier>
+#include <latch>
+#include <sstream>
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -6,7 +9,13 @@
 #include <atomic>
 #include <shared_mutex>
 #include <array>
-
+#include <queue>
+#include <boost/asio.hpp>
+#include <future>
+#include <curl/curl.h>
+#include <list>
+#include <format>
+#include <cstdio>
 namespace za
 {
 	namespace pp
@@ -210,6 +219,9 @@ namespace za
 			*/
 			static int sushi_count_ss = 5000;
 			void philosopher_ss(std::mutex& chopsticks);
+			void foo();
+
+			void bar(int x);
 			void demo11();
 		}		
 		namespace live_lock
@@ -235,5 +247,215 @@ namespace za
 			void philosopher_ll(std::mutex& first_chopstick, std::mutex& second_chopstick);
 			void demo12();
 		}
+		namespace condition_variablee
+		{
+			/**
+			* Two hungry threads, anxiously waiting for their turn to take soup
+			*/
+			
+			static int soup_servings_cv = 10;
+			static std::mutex slow_cooker_lid_cv;
+			static std::condition_variable soup_taken_cv;
+			void hungry_person(int id);
+			void demo13();
+		}				
+		namespace producer_consumer
+		{
+			/**
+			 * Threads serving and eating soup
+			 */
+			
+			class ServingLine
+			{
+			public:
+				void serve_soup(int i);
+
+				int take_soup();
+
+			private:
+				std::queue<int> soup_queue;
+				std::mutex ladle;
+				std::condition_variable soup_served;
+			};
+
+			static ServingLine serving_line = ServingLine();
+
+			void soup_producer(std::string name);
+
+			void soup_consumer(std::string name);
+
+			void demo14();
+		}				
+		namespace semaphore
+		{
+			/**
+			 * Connecting cell phones to a charger
+			 */
+			class Semaphore 
+			{
+			public:
+				// number of slots in the charger
+				Semaphore(unsigned long init_count);
+
+				// decrement the internal counter
+				void acquire();
+				// increment the internal counter
+				void release();
+
+			private:
+				std::mutex m_;
+				std::condition_variable cv_;
+				unsigned long count_;
+			};
+
+			static Semaphore charger(1);
+
+			void cell_phone(int id);
+			
+			void demo15();
+		}				
+		namespace race_condition
+		{
+			/**
+			 * Deciding how many bags of chips to buy for the party
+			 */
+			static unsigned int bags_of_chips = 1; // start with one on the list
+			static std::mutex pencil;
+
+			void cpu_work(unsigned long workUnits);
+			void barron_shopper();
+			void olivia_shopper();
+
+			void demo16();
+		}		
+		namespace barrierr
+		{
+			/**
+			 * Deciding how many bags of chips to buy for the party
+			 */
+			static unsigned int bags_of_chips = 1; // start with one on the list
+			static std::mutex pencil;
+			static std::barrier fist_bump(10);
+
+			void cpu_work(unsigned long workUnits);
+			void barron_shopper();
+			void olivia_shopper();
+
+			void demo17();
+		}	
+		namespace latchh
+		{
+			/**
+			 * Deciding how many bags of chips to buy for the party
+			 */
+			static unsigned int bags_of_chips = 1; // start with one on the list
+			static std::mutex pencil;
+			static std::latch fist_bump(10);
+
+			void cpu_work(unsigned long workUnits);
+			void barron_shopper();
+			void olivia_shopper();
+
+			void demo18();
+		}				
+		namespace thread_pool
+		{
+			/**
+			 * Chopping vegetables with a thread pool
+			 */
+			void vegetable_chopper(int vegetable_id);
+
+			void demo19();
+		}					
+		namespace futuree
+		{
+			/**
+			 * Check how many vegetables are in the pantry
+			 */
+			int how_many_vegetables();
+
+			void demo20();
+		}		
+		namespace divide_and_conquer
+		{
+			/**
+			 * Recursively sum range of numbers
+			 */
+			unsigned long long recursive_sum(unsigned int lo, unsigned int hi, unsigned int depth = 0);
+			void demo21();
+		}			
+		namespace measure_speedup
+		{
+			/**
+			 * Measure the speedup of a parallel algorithm
+			 */
+			unsigned long long sequential_sum(unsigned int lo, unsigned int hi);
+
+			unsigned long long parallel_sum(unsigned int lo, unsigned int hi, unsigned int depth = 0);
+
+			void demo22();
+		}		
+		namespace matrix_multiplyy
+		{
+			/**
+			 *  Multiply two matrices
+			 */
+			 /* sequential implementation of matrix multiply */
+			void sequential_matrix_multiply(long** A, size_t num_rows_a, size_t num_cols_a,
+				long** B, size_t num_rows_b, size_t num_cols_b,
+				long** C);
+
+			/* prototype of helper function for parallel_matrix_multiply */
+			void parallel_worker(long**, size_t, size_t, long**, size_t, size_t, long**, size_t, size_t);
+
+			/* parallel implementation of matrix multiply */
+			void parallel_matrix_multiply(long** A, size_t num_rows_a, size_t num_cols_a,
+				long** B, size_t num_rows_b, size_t num_cols_b,
+				long** C);
+
+			/* helper function for parallel_matrix_multiply */
+			void parallel_worker(long** A, size_t num_rows_a, size_t num_cols_a,
+				long** B, size_t num_rows_b, size_t num_cols_b,
+				long** C, size_t start_row_c, size_t end_row_c);
+
+			void demo23();
+		}				
+		namespace merge_sortt
+		{
+			/**
+			 *  Sort an array of random integers with merge sort
+			 */
+			 /* helper function to merge two sorted subarrays
+				array[l..m] and array[m+1..r] into array */
+			void merge(int* array, unsigned int left, unsigned int mid, unsigned int right);
+
+			/* sequential implementation of merge sort */
+			void sequential_merge_sort(int* array, unsigned int left, unsigned int right);
+
+			/* parallel implementation of merge sort */
+			void parallel_merge_sort(int* array, unsigned int left, unsigned int right, unsigned int depth = 0);
+
+			void demo24();
+		}			
+		namespace download_images
+		{
+			/* helper function to download a single image and return size in bytes */
+			size_t download_image(int image_num);
+			/* support function for the download_image helper function */
+			size_t write_callback(void* contents, size_t size, size_t nmemb, void* userp);
+
+			/* sequential implementation of image downloader */
+			size_t sequential_image_downloader(int num_images);
+
+			/* parallel implementation of image downloader */
+			size_t parallel_image_downloader(int num_images);
+	
+			/* support function for the download_image helper function */
+			size_t write_callback(void* contents, size_t size, size_t nmemb, void* userp);
+
+			void demo25(); 
+		}	
+	
+
 	}
 }
